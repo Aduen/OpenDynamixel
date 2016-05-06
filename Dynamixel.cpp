@@ -13,23 +13,23 @@ Dynamixel::Dynamixel(HardwareSerial *serial) {
 }
 
 Dynamixel::~Dynamixel() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 void Dynamixel::begin(int baud, uint8_t DE_pin){
-
+    
     mDxlUsart->begin(baud, SERIAL_8N1);
     mDirPin = DE_pin;
     mDxlUsart->transmitterEnable(mDirPin);
     
-	delay(100);
-	mDXLtxrxStatus = 0;
-	mBusUsed = 0;// only 1 when tx/rx is operated
-
-	this->setLibStatusReturnLevel(2);
-	this->setLibNumberTxRxAttempts(1);
-	
+    delay(100);
+    mDXLtxrxStatus = 0;
+    mBusUsed = 0;// only 1 when tx/rx is operated
+    
+    this->setLibStatusReturnLevel(2);
+    this->setLibNumberTxRxAttempts(1);
+    
     mDxlUsart->clear();
-
+    
     mPktIdIndex = 4;
     mPktLengthIndex = 5;
     mPktInstIndex = 7;
@@ -59,66 +59,66 @@ byte Dynamixel::available(void){
 }
 
 byte Dynamixel::getPacketType(void){
-	return mPacketType;
+    return mPacketType;
 }
 
 byte Dynamixel::setLibStatusReturnLevel(byte num)
 {
-	gbDXLStatusReturnLevel = num;
-	return gbDXLStatusReturnLevel;
+    gbDXLStatusReturnLevel = num;
+    return gbDXLStatusReturnLevel;
 }
 
 byte Dynamixel::setLibNumberTxRxAttempts(byte num)
 {
-	gbDXLNumberTxRxAttempts = num;
-	return gbDXLNumberTxRxAttempts;
+    gbDXLNumberTxRxAttempts = num;
+    return gbDXLNumberTxRxAttempts;
 }
 /*
  * return value for getTxRxStatus(), getResult();
-#define	COMM_TXSUCCESS		(0)
-#define COMM_RXSUCCESS		(1)
-#define COMM_TXFAIL			(2)
-#define COMM_RXFAIL			(3)
-#define COMM_TXERROR		(4)
-#define COMM_RXWAITING		(5)
-#define COMM_RXTIMEOUT		(6)
-#define COMM_RXCORRUPT		(7)
-*/
+ #define	COMM_TXSUCCESS		(0)
+ #define COMM_RXSUCCESS		(1)
+ #define COMM_TXFAIL			(2)
+ #define COMM_RXFAIL			(3)
+ #define COMM_TXERROR		(4)
+ #define COMM_RXWAITING		(5)
+ #define COMM_RXTIMEOUT		(6)
+ #define COMM_RXCORRUPT		(7)
+ */
 byte Dynamixel::getTxRxStatus(void) // made by NaN (Robotsource.org)
 {
-	return mDXLtxrxStatus;
+    return mDXLtxrxStatus;
 }
 /*
  * Use getTxRxStatus() instead of getResult()
  * */
 byte  Dynamixel::getResult(void){
-	//	return mCommStatus;
-	return this->getTxRxStatus();
+    //	return mCommStatus;
+    return this->getTxRxStatus();
 }
 /*
  *  ERROR Bit table is below.
-
-//DXL 1.0 protocol
-#define ERRBIT_VOLTAGE		(1)
-#define ERRBIT_ANGLE		(2)
-#define ERRBIT_OVERHEAT		(4)
-#define ERRBIT_RANGE		(8)
-#define ERRBIT_CHECKSUM		(16)
-#define ERRBIT_OVERLOAD		(32)
-#define ERRBIT_INSTRUCTION	(64)
-
-//DXL 2.0 protocol
-#define ERRBIT_RESULT_FAIL	(1)
-#define ERRBIT_INST_ERROR	(2)
-#define ERRBIT_CRC			(4)
-#define ERRBIT_DATA_RANGE	(8)
-#define ERRBIT_DATA_LENGTH	(16)
-#define ERRBIT_DATA_LIMIT	(32)
-#define ERRBIT_ACCESS		(64)
+ 
+ //DXL 1.0 protocol
+ #define ERRBIT_VOLTAGE		(1)
+ #define ERRBIT_ANGLE		(2)
+ #define ERRBIT_OVERHEAT		(4)
+ #define ERRBIT_RANGE		(8)
+ #define ERRBIT_CHECKSUM		(16)
+ #define ERRBIT_OVERLOAD		(32)
+ #define ERRBIT_INSTRUCTION	(64)
+ 
+ //DXL 2.0 protocol
+ #define ERRBIT_RESULT_FAIL	(1)
+ #define ERRBIT_INST_ERROR	(2)
+ #define ERRBIT_CRC			(4)
+ #define ERRBIT_DATA_RANGE	(8)
+ #define ERRBIT_DATA_LENGTH	(16)
+ #define ERRBIT_DATA_LIMIT	(32)
+ #define ERRBIT_ACCESS		(64)
  * */
 byte Dynamixel::getError( byte errbit )
 {
-	//return dxl_get_rxpacket_error( errbit );
+    //return dxl_get_rxpacket_error( errbit );
     if( mRxBuffer[8] & errbit ) return 1;
     else return 0;
 }
@@ -278,24 +278,24 @@ void Dynamixel::printBuffer(byte *bpPrintBuffer, byte bLength)
     if(debugFlag == 0) return;
     
     byte bCount;
-	if(bLength == 0)
-	{
-		if(mTxBuffer[2] == BROADCAST_ID)
-		{
-			mDebugUsart->println("No Data[at Broadcast ID 0xFE]");
-		}
-		else
-		{
-			mDebugUsart->println("No Data(Check ID, Operating Mode, Baud rate)");
-		}
-	}
-	for(bCount = 0; bCount < bLength; bCount++)
-	{
-		mDebugUsart->print(bpPrintBuffer[bCount]);
-		mDebugUsart->print(' ');
-	}
-	mDebugUsart->print(" LEN:");//("(LEN:")
-	mDebugUsart->println(bLength);
+    if(bLength == 0)
+    {
+        if(mTxBuffer[2] == BROADCAST_ID)
+        {
+            mDebugUsart->println("No Data[at Broadcast ID 0xFE]");
+        }
+        else
+        {
+            mDebugUsart->println("No Data(Check ID, Operating Mode, Baud rate)");
+        }
+    }
+    for(bCount = 0; bCount < bLength; bCount++)
+    {
+        mDebugUsart->print(bpPrintBuffer[bCount]);
+        mDebugUsart->print(' ');
+    }
+    mDebugUsart->print(" LEN:");//("(LEN:")
+    mDebugUsart->println(bLength);
 }
 
 byte Dynamixel::txRxPacket(byte bID, byte bInst, int bTxParaLen)
@@ -375,9 +375,9 @@ byte Dynamixel::txRxPacket(byte bID, byte bInst, int bTxParaLen)
 
 word  Dynamixel::ping(byte  bID )
 {
-	if(this->txRxPacket(bID, INST_PING, 0))
-		return DXL_MAKEWORD(mRxBuffer[9],mRxBuffer[10]); //return product code when 2.0
-	
+    if(this->txRxPacket(bID, INST_PING, 0))
+        return DXL_MAKEWORD(mRxBuffer[9],mRxBuffer[10]); //return product code when 2.0
+    
     return 0xffff;  //no dxl in bus.
 }
 
@@ -387,39 +387,39 @@ word  Dynamixel::ping(byte  bID )
  * */
 uint32_t Dynamixel::ping(void)
 {
-	int i=0;
-	uint32_t result=0;
-
-	if(this->txRxPacket(BROADCAST_ID, INST_PING, 0)){
-		for(i=0; i < 32*14; i+=14){
-			if(mRxBuffer[i] == 0xFF && mRxBuffer[i+1] == 0xFF && mRxBuffer[i+2] == 0xFD){
-				result |= 1UL << mRxBuffer[i+4];
-			}
-		}
-		return result;
-	}
+    int i=0;
+    uint32_t result=0;
+    
+    if(this->txRxPacket(BROADCAST_ID, INST_PING, 0)){
+        for(i=0; i < 32*14; i+=14){
+            if(mRxBuffer[i] == 0xFF && mRxBuffer[i+1] == 0xFF && mRxBuffer[i+2] == 0xFD){
+                result |= 1UL << mRxBuffer[i+4];
+            }
+        }
+        return result;
+    }
     
     return 0xFFFFFFFF;  //no dxl in bus.
 }
 
 byte  Dynamixel::writeByte(byte bID, word bAddress, byte bData)
 {
-	byte param_length = 0;
-
+    byte param_length = 0;
+    
     //insert wAddress to parameter bucket
     mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(bAddress);
     mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(bAddress);
     //insert data to parameter bucket
     mParamBuffer[2]	= bData;
     param_length = 3;
-
-	return this->txRxPacket(bID, INST_WRITE, param_length);
+    
+    return this->txRxPacket(bID, INST_WRITE, param_length);
 }
 
 byte Dynamixel::readByte(byte bID, word bAddress)
 {
     mDxlUsart->clear();
-
+    
     mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(bAddress);
     mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(bAddress);
     mParamBuffer[2]	= 1; //1byte
@@ -427,7 +427,7 @@ byte Dynamixel::readByte(byte bID, word bAddress)
     if( this->txRxPacket(bID, INST_READ, 4 )){
         return(mRxBuffer[9]);//refer to 2.0 packet structure
     }
-
+    
     return 0xff;
 }
 
@@ -437,15 +437,15 @@ byte Dynamixel::writeWord(byte bID, word bAddress, word wData)
 {
     byte param_length = 0;
     mDxlUsart->clear();
-
+    
     mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(bAddress);
     mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(bAddress);
     //insert data to parameter bucket
     mParamBuffer[2]	= DXL_LOBYTE(wData);
     mParamBuffer[3]	= DXL_HIBYTE(wData);
     param_length = 4;
-
-	return this->txRxPacket(bID, INST_WRITE, param_length);
+    
+    return this->txRxPacket(bID, INST_WRITE, param_length);
 }
 
 
@@ -453,7 +453,7 @@ byte Dynamixel::writeWord(byte bID, word bAddress, word wData)
 word Dynamixel::readWord(byte bID, word bAddress)
 {
     mDxlUsart->clear();
-
+    
     mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(bAddress);
     mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(bAddress);
     mParamBuffer[2]	= 2; //2byte
@@ -469,30 +469,30 @@ word Dynamixel::readWord(byte bID, word bAddress)
 byte Dynamixel::writeDword( byte bID, word wAddress, uint32_t value )
 {
     mDxlUsart->clear();
-
-	//insert wAddress to parameter bucket
-	mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(wAddress);
-	mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(wAddress);
-	//insert data to parameter bucket
-	mParamBuffer[2]	= DXL_LOBYTE(DXL_LOWORD(value));
-	mParamBuffer[3]	= DXL_HIBYTE(DXL_LOWORD(value));
-	mParamBuffer[4]	= DXL_LOBYTE(DXL_HIWORD(value));
-	mParamBuffer[5]	= DXL_HIBYTE(DXL_HIWORD(value));
-
-	return this->txRxPacket(bID, INST_WRITE, 6); //// parameter length 4 = 2(address)+2(data)
+    
+    //insert wAddress to parameter bucket
+    mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(wAddress);
+    mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(wAddress);
+    //insert data to parameter bucket
+    mParamBuffer[2]	= DXL_LOBYTE(DXL_LOWORD(value));
+    mParamBuffer[3]	= DXL_HIBYTE(DXL_LOWORD(value));
+    mParamBuffer[4]	= DXL_LOBYTE(DXL_HIWORD(value));
+    mParamBuffer[5]	= DXL_HIBYTE(DXL_HIWORD(value));
+    
+    return this->txRxPacket(bID, INST_WRITE, 6); //// parameter length 4 = 2(address)+2(data)
 }
 
 uint32_t Dynamixel::readDword( byte bID, word wAddress )
 {
-	mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(wAddress);
-	mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(wAddress);
-	mParamBuffer[2]	= 4; //4byte
-	mParamBuffer[3]	= 0;
-	if(this->txRxPacket(bID, INST_READ, 4)){
-		return DXL_MAKEDWORD( DXL_MAKEWORD( mRxBuffer[9], mRxBuffer[10]),
-							  DXL_MAKEWORD( mRxBuffer[11], mRxBuffer[12]));
-	}
-		
+    mParamBuffer[0]	= (unsigned char)DXL_LOBYTE(wAddress);
+    mParamBuffer[1]	= (unsigned char)DXL_HIBYTE(wAddress);
+    mParamBuffer[2]	= 4; //4byte
+    mParamBuffer[3]	= 0;
+    if(this->txRxPacket(bID, INST_READ, 4)){
+        return DXL_MAKEDWORD( DXL_MAKEWORD( mRxBuffer[9], mRxBuffer[10]),
+                             DXL_MAKEWORD( mRxBuffer[11], mRxBuffer[12]));
+    }
+    
     return 0xFFFFFFFF;
 }
 
@@ -504,7 +504,7 @@ uint32_t Dynamixel::readDword( byte bID, word wAddress )
 byte Dynamixel::setPosition(byte ServoID, int Position, int Speed)
 {
     byte param_length = 0;
-
+    
     mParamBuffer[0]	= 30;
     mParamBuffer[1]	= 0;
     //insert data to parameter bucket
@@ -514,16 +514,16 @@ byte Dynamixel::setPosition(byte ServoID, int Position, int Speed)
     mParamBuffer[5] = (unsigned char)DXL_HIBYTE(Speed);
     param_length = 6;
     
-	return (this->txRxPacket(ServoID, INST_WRITE, param_length));
-
+    return (this->txRxPacket(ServoID, INST_WRITE, param_length));
+    
 }
 byte Dynamixel::syncWrite(int start_addr, int data_length, word *param, int param_length)
 {
-	int i=0, j=0, k=0, num=0;
+    int i=0, j=0, k=0, num=0;
     mDxlUsart->clear();
     
-	num = param_length/(data_length + 1); //ID+DATA1+DATA2..
-
+    num = param_length/(data_length + 1); //ID+DATA1+DATA2..
+    
     mParamBuffer[0]   = DXL_LOBYTE(start_addr);
     mParamBuffer[1]   = DXL_HIBYTE(start_addr);
     mParamBuffer[2]   = DXL_LOBYTE(data_length*2);
@@ -537,85 +537,85 @@ byte Dynamixel::syncWrite(int start_addr, int data_length, word *param, int para
             k++;
         }
     }
-
+    
     return this->txRxPacket(BROADCAST_ID, INST_SYNC_WRITE, i);
 }
 
 byte Dynamixel::syncWrite(int start_addr, byte data_length, int *param, int param_length){
-	int i=0, j=0, k=0, num=0;
-
+    int i=0, j=0, k=0, num=0;
+    
     mDxlUsart->clear();
-
-	num = param_length / (data_length + 1);
-
-	mParamBuffer[0]   = DXL_LOBYTE(start_addr);
-	mParamBuffer[1]   = DXL_HIBYTE(start_addr);
-	mParamBuffer[2]   = DXL_LOBYTE(data_length*4);
-	mParamBuffer[3]   = DXL_HIBYTE(data_length*4);
-
-	for(i=4; i < (4+num*(1+data_length*4)); i+=(1+data_length*4) ){
-		mParamBuffer[i]   = (byte)param[k++]; //ID
-		for(j=0; j < (data_length*4); j+=4){
-			mParamBuffer[i+j+1] = DXL_LOBYTE(DXL_LOWORD(param[k])); //data
-			mParamBuffer[i+j+2] = DXL_HIBYTE(DXL_LOWORD(param[k]));
-			mParamBuffer[i+j+3] = DXL_LOBYTE(DXL_HIWORD(param[k]));
-			mParamBuffer[i+j+4] = DXL_HIBYTE(DXL_HIWORD(param[k]));
-			k++;
-		}
-
-	}
-	return this->txRxPacket(BROADCAST_ID, INST_SYNC_WRITE, 4+i);
+    
+    num = param_length / (data_length + 1);
+    
+    mParamBuffer[0]   = DXL_LOBYTE(start_addr);
+    mParamBuffer[1]   = DXL_HIBYTE(start_addr);
+    mParamBuffer[2]   = DXL_LOBYTE(data_length*4);
+    mParamBuffer[3]   = DXL_HIBYTE(data_length*4);
+    
+    for(i=4; i < (4+num*(1+data_length*4)); i+=(1+data_length*4) ){
+        mParamBuffer[i]   = (byte)param[k++]; //ID
+        for(j=0; j < (data_length*4); j+=4){
+            mParamBuffer[i+j+1] = DXL_LOBYTE(DXL_LOWORD(param[k])); //data
+            mParamBuffer[i+j+2] = DXL_HIBYTE(DXL_LOWORD(param[k]));
+            mParamBuffer[i+j+3] = DXL_LOBYTE(DXL_HIWORD(param[k]));
+            mParamBuffer[i+j+4] = DXL_HIBYTE(DXL_HIWORD(param[k]));
+            k++;
+        }
+        
+    }
+    return this->txRxPacket(BROADCAST_ID, INST_SYNC_WRITE, 4+i);
 }
 
 void Dynamixel::setTxPacketId(byte id)
 {
-	mbIDForPacketMaking = id;
+    mbIDForPacketMaking = id;
 }
 
 void Dynamixel::setTxPacketInstruction(byte instruction)
 {
-	mbInstructionForPacketMaking = instruction;
+    mbInstructionForPacketMaking = instruction;
 }
 
 void Dynamixel::setTxPacketParameter( byte index, byte value )
 {
-	mParamBuffer[index] = value;
+    mParamBuffer[index] = value;
 }
 
 void Dynamixel::setTxPacketLength( byte length )
 {
-	mbLengthForPacketMaking = length;
+    mbLengthForPacketMaking = length;
 }
 
 byte Dynamixel::txrxPacket(void)
 {
-	mCommStatus = this->txRxPacket(mbIDForPacketMaking, mbInstructionForPacketMaking, mbLengthForPacketMaking);
-	return mCommStatus;
+    mCommStatus = this->txRxPacket(mbIDForPacketMaking, mbInstructionForPacketMaking, mbLengthForPacketMaking);
+    return mCommStatus;
 }
 
 int Dynamixel::getRxPacketParameter( int index )
 {
-	return mRxBuffer[5 + index];
+    return mRxBuffer[5 + index];
 }
 
 int Dynamixel::getRxPacketLength(void)
 {
-	return mRxBuffer[3]; //length index is 3 in status packet
+    return mRxBuffer[3]; //length index is 3 in status packet
 }
 
 word Dynamixel::getModelNumber(byte bID)
 {
-	return this->readWord(bID, 0);
+    return this->readWord(bID, 0);
 }
 
 void Dynamixel::setID(byte current_ID, byte new_ID)
 {
-	this->writeByte(current_ID, 3, new_ID);
+    this->writeByte(current_ID, 3, new_ID);
 }
 
 void Dynamixel::setBaud(byte bID, byte baud_num)
 {
-	this->writeByte(bID, 4, baud_num);
+    this->writeByte(bID, 4, baud_num);
 }
 
 void Dynamixel::returnLevel(byte bID, byte level)
@@ -630,27 +630,27 @@ byte Dynamixel::returnLevel(byte bID)
 
 void Dynamixel::returnDelayTime(byte bID, byte time)
 {
-	this->writeByte(bID, 5, time);
+    this->writeByte(bID, 5, time);
 }
 
 byte Dynamixel::returnDelayTime(byte bID)
 {
-	return this->readByte(bID, 5);
+    return this->readByte(bID, 5);
 }
 
 void Dynamixel::alarmShutdown(byte bID,byte option)
 {
-	this->writeByte(bID, 18, option);
+    this->writeByte(bID, 18, option);
 }
 
 byte Dynamixel::alarmShutdown(byte bID)
 {
-	return this->readByte(bID, 18);
+    return this->readByte(bID, 18);
 }
 
 void Dynamixel::controlMode(byte bID, byte mode)
 {
-	word model=0;
+    word model=0;
     this->writeByte(bID, 24, 0);
     this->writeByte(bID, 11, mode);
     this->writeByte(bID, 24, 1);
@@ -663,14 +663,14 @@ byte Dynamixel::controlMode(byte bID)
 
 void Dynamixel::wheelMode(byte bID)
 {
-		this->writeByte(bID, 24, 0);
-		this->writeByte(bID, 11, 1);
-		this->writeByte(bID, 24, 1);
+    this->writeByte(bID, 24, 0);
+    this->writeByte(bID, 11, 1);
+    this->writeByte(bID, 24, 1);
 }
 
 void Dynamixel::jointMode(byte bID)
 {
-	word model=0;
+    word model=0;
     this->writeByte(bID, 24, 0);
     this->writeByte(bID, 11, 2);
     this->writeByte(bID, 24, 1);
@@ -718,42 +718,42 @@ byte Dynamixel::maxTemperature(byte bID)
 
 void Dynamixel::torqueEnable(byte bID)
 {
-	this->writeByte(bID, 24, 1);
+    this->writeByte(bID, 24, 1);
 }
 
 void Dynamixel::torqueDisable(byte bID)
 {
-	this->writeByte(bID, 24, 0);
+    this->writeByte(bID, 24, 0);
 }
 
 void Dynamixel::cwAngleLimit(byte bID, word angle)
 {
-	this->writeWord(bID, 6, angle);
+    this->writeWord(bID, 6, angle);
 }
 
 word Dynamixel::cwAngleLimit(byte bID)
 {
-	return this->readWord(bID, 6);
+    return this->readWord(bID, 6);
 }
 
 void Dynamixel::ccwAngleLimit(byte bID, word angle)
 {
-	this->writeWord(bID, 8, angle);
+    this->writeWord(bID, 8, angle);
 }
 
 word Dynamixel::ccwAngleLimit(byte bID)
 {
-	return this->readWord(bID, 8);
+    return this->readWord(bID, 8);
 }
 
 void Dynamixel::goalPosition(byte bID, int position)
 {
-	this->writeWord(bID, 30, position);
+    this->writeWord(bID, 30, position);
 }
 
 void Dynamixel::goalSpeed(byte bID, int speed)
 {
-	this->writeWord(bID, 32, speed);
+    this->writeWord(bID, 32, speed);
 }
 
 void Dynamixel::goalTorque(byte bID, int torque)
@@ -793,7 +793,7 @@ byte Dynamixel::isMoving(byte bID)
 
 void Dynamixel::ledOn(byte bID)
 {
-	this->writeByte(bID, 25, 1);
+    this->writeByte(bID, 25, 1);
 }
 
 void Dynamixel::punch(byte bID, int kick)
@@ -816,11 +816,11 @@ void Dynamixel::punch(byte bID, int kick)
  **/
 void Dynamixel::ledOn(byte bID, byte option)
 {
-	this->writeByte(bID, 25, option);
+    this->writeByte(bID, 25, option);
 }
 
 void Dynamixel::ledOff(byte bID){
-	this->writeByte(bID, 25, 0);
+    this->writeByte(bID, 25, 0);
 }
 
 void Dynamixel::setPID(byte bID, byte propotional, byte integral, byte derivative)
@@ -832,7 +832,7 @@ void Dynamixel::setPID(byte bID, byte propotional, byte integral, byte derivativ
 
 void Dynamixel::cwTurn(byte bID, word speed)
 {
-	//check if servo is in wheelmode
+    //check if servo is in wheelmode
     word mode=0;
     mode = this->readByte(bID, 11);
     
@@ -844,12 +844,12 @@ void Dynamixel::cwTurn(byte bID, word speed)
 
 void Dynamixel::ccwTurn(byte bID, word speed)
 {
-	//check if servo is in wheelmode
+    //check if servo is in wheelmode
     word mode=0;
     mode = this->readByte(bID, 11);
     
     //if not set it in wheelmode
-	if(mode != 1) this->writeByte(bID, 11, 1);
+    if(mode != 1) this->writeByte(bID, 11, 1);
     
     this->writeWord(bID, 32, speed);
 }
@@ -859,10 +859,10 @@ void Dynamixel::ccwTurn(byte bID, word speed)
  * */
 void Dynamixel::initPacket(byte bID, byte bInst)
 {
-	mbLengthForPacketMaking = 0;
-	mbIDForPacketMaking = bID;
-	mbInstructionForPacketMaking = bInst;
-	mCommStatus = 0;
+    mbLengthForPacketMaking = 0;
+    mbIDForPacketMaking = bID;
+    mbInstructionForPacketMaking = bInst;
+    mCommStatus = 0;
 }
 
 /*
@@ -870,31 +870,31 @@ void Dynamixel::initPacket(byte bID, byte bInst)
  * */
 void Dynamixel::pushByte(byte value)
 {
-	//packet length is not above the maximum 143 bytes because size of buffer receiver has only 143 bytes capacity.
-	//please refer to ROBOTIS e-manual (support.robotis.com)
-	if(mbLengthForPacketMaking > 140)//prevent violation of memory access
-		return;
-	mParamBuffer[mbLengthForPacketMaking++] = value;
+    //packet length is not above the maximum 143 bytes because size of buffer receiver has only 143 bytes capacity.
+    //please refer to ROBOTIS e-manual (support.robotis.com)
+    if(mbLengthForPacketMaking > 140)//prevent violation of memory access
+        return;
+    mParamBuffer[mbLengthForPacketMaking++] = value;
 }
 
 void Dynamixel::pushParam(byte value)
 {
-	if(mbLengthForPacketMaking > 140)//prevent violation of memory access
-			return;
-	mParamBuffer[mbLengthForPacketMaking++] = value;
+    if(mbLengthForPacketMaking > 140)//prevent violation of memory access
+        return;
+    mParamBuffer[mbLengthForPacketMaking++] = value;
 }
 
 void Dynamixel::pushParam(int value)
 {
-	if(mbLengthForPacketMaking > 140)//prevent violation of memory access
-			return;
-	mParamBuffer[mbLengthForPacketMaking++] = (unsigned char)DXL_LOBYTE(value);
-	mParamBuffer[mbLengthForPacketMaking++] = (unsigned char)DXL_HIBYTE(value);
+    if(mbLengthForPacketMaking > 140)//prevent violation of memory access
+        return;
+    mParamBuffer[mbLengthForPacketMaking++] = (unsigned char)DXL_LOBYTE(value);
+    mParamBuffer[mbLengthForPacketMaking++] = (unsigned char)DXL_HIBYTE(value);
 }
 
 /*
  * @brief transfers packets to dynamixel bus
  * */
 void Dynamixel::flushPacket(void){
-	return mDxlUsart->flush();
+    return mDxlUsart->flush();
 }
