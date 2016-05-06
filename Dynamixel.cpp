@@ -8,7 +8,7 @@
 
 Dynamixel::Dynamixel(HardwareSerial *serial) {
     mDxlUsart = serial;
-    SmartDelayFlag = 0;
+    SmartDelayFlag = 1;
     debugFlag = 0;
 }
 
@@ -352,9 +352,12 @@ byte Dynamixel::txRxPacket(byte bID, byte bInst, int bTxParaLen)
         if(bRxLenEx){
             //unsure if this delay is actually "smart"
             if(SmartDelayFlag == 1)
-                delayMicroseconds(210);
+                delayMicroseconds(110);
             //RX
             mRxLength = rxPacket(bRxLenEx);
+            //TODO: find out more about this bug
+            //there is a problem with calls following each other up, for now a 400-500uS delay seems to do the trick
+            delayMicroseconds(400);
         }
     }
     
