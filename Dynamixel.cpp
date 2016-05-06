@@ -9,6 +9,7 @@
 Dynamixel::Dynamixel(HardwareSerial *serial) {
     mDxlUsart = serial;
     SmartDelayFlag = 0;
+    debugFlag = 0;
 }
 
 Dynamixel::~Dynamixel() {
@@ -33,6 +34,12 @@ void Dynamixel::begin(int baud, uint8_t DE_pin){
     mPktLengthIndex = 5;
     mPktInstIndex = 7;
     mPktErrorIndex = 8;
+}
+
+void Dynamixel::addDebugStream(HardwareSerial *serial)
+{
+    debugFlag = 1;
+    mDebugUsart = serial;
 }
 
 byte Dynamixel::readRaw(void){
@@ -167,7 +174,7 @@ byte Dynamixel::rxPacket(int bRxLength)
     for(bCount = 0; bCount < bRxLength; bCount++)
     {
         ulCounter = 0;
-        while(Serial2.available() == 0)
+        while(mDxlUsart->available() == 0)
         {
             delayMicroseconds(12); //[ROBOTIS] porting ydh //it was in nano's for some reason, 12000nS
             if(ulCounter++ > ulTimeLimit)
@@ -178,7 +185,7 @@ byte Dynamixel::rxPacket(int bRxLength)
         }
         
         if(bTimeout) break;
-        mRxBuffer[bCount] = Serial2.read(); // get one byte from USART device
+        mRxBuffer[bCount] = mDxlUsart->read(); // get one byte from USART device
     }
     
     bLength = bCount;
@@ -188,7 +195,7 @@ byte Dynamixel::rxPacket(int bRxLength)
         if(bTimeout && bRxLength != 255)
         {
             mDXLtxrxStatus |= (1<<COMM_RXTIMEOUT);
-            Serial2.clear();
+            mDxlUsart->clear();
             
             return 0;
         }
@@ -198,53 +205,53 @@ byte Dynamixel::rxPacket(int bRxLength)
             // Dxl 2.0 header check
             if(mRxBuffer[0] != 0xff || mRxBuffer[1] != 0xff || mRxBuffer[2] != 0xfd)
             {
-                Serial.println("Wrong Header");//[Wrong Header]
+                if(debugFlag) mDebugUsart->println("Wrong Header");//[Wrong Header]
                 mDXLtxrxStatus |= (1<<COMM_RXCORRUPT);//RXHEADER);
-                Serial2.clear();
+                mDxlUsart->clear();
                 return 0;
             }
             // Dxl match send and recv id's
             if(mRxBuffer[mPktIdIndex] != mTxBuffer[mPktIdIndex] )  //id check
             {
-                Serial.println("[Error:TxID != RxID]");
+                if(debugFlag) mDebugUsart->println("[Error:TxID != RxID]");
                 mDXLtxrxStatus |= (1<<COMM_RXCORRUPT);//RXID);
-                Serial2.clear();
+                mDxlUsart->clear();
                 return 0;
             }
             
             //Dxl check status packet length
             if(mRxBuffer[mPktLengthIndex] != bLength-mPktInstIndex) // status packet length check
             {
-                Serial.println("RxLength Error");
+                if(debugFlag) mDebugUsart->println("RxLength Error");
                 mDXLtxrxStatus |= (1<<COMM_RXCORRUPT);//RXLENGTH);
-                Serial2.clear();
+                mDxlUsart->clear();
                 return 0;
             }
             
             int bTryCount = 0;
             for(bTryCount = 1; bTryCount<= 7; bTryCount++){
-                if((mRxBuffer[mPktErrorIndex]) == bTryCount){
+                if((mRxBuffer[mPktErrorIndex] && debugFlag) == bTryCount){
                     switch(bTryCount){
                         case 1:
-                            Serial.println("Result Fail");
+                            mDebugUsart->println("Result Fail");
                             break;
                         case 2:
-                            Serial.println("Instruction Error");
+                            mDebugUsart->println("Instruction Error");
                             break;
                         case 3:
-                            Serial.println("CRC Error");
+                            mDebugUsart->println("CRC Error");
                             break;
                         case 4:
-                            Serial.println("DataRange Error");
+                            mDebugUsart->println("DataRange Error");
                             break;
                         case 5:
-                            Serial.println("DataLength Error");
+                            mDebugUsart->println("DataLength Error");
                             break;
                         case 6:
-                            Serial.println("DataLimit Error");
+                            mDebugUsart->println("DataLimit Error");
                             break;
                         case 7:
-                            Serial.println("Accrss Error");
+                            mDebugUsart->println("Accrss Error");
                             break;
                     }
                 }
@@ -257,7 +264,7 @@ byte Dynamixel::rxPacket(int bRxLength)
                 return bLength;
             }
             else{
-                Serial.println("CRC-16 Error\r\n");
+                if(debugFlag) mDebugUsart->println("CRC-16 Error\r\n");
                 return 0;
             }
         }//(bLength > 3)
@@ -268,25 +275,27 @@ byte Dynamixel::rxPacket(int bRxLength)
 
 void Dynamixel::printBuffer(byte *bpPrintBuffer, byte bLength)
 {
-	byte bCount;
+    if(debugFlag == 0) return;
+    
+    byte bCount;
 	if(bLength == 0)
 	{
 		if(mTxBuffer[2] == BROADCAST_ID)
 		{
-			Serial.println("No Data[at Broadcast ID 0xFE]");
+			mDebugUsart->println("No Data[at Broadcast ID 0xFE]");
 		}
 		else
 		{
-			Serial.println("No Data(Check ID, Operating Mode, Baud rate)");//TxDString("\r\n No Data(Check ID, Operating Mode, Baud rate)");
+			mDebugUsart->println("No Data(Check ID, Operating Mode, Baud rate)");
 		}
 	}
 	for(bCount = 0; bCount < bLength; bCount++)
 	{
-		Serial.print(bpPrintBuffer[bCount]);
-		Serial.print(' ');
+		mDebugUsart->print(bpPrintBuffer[bCount]);
+		mDebugUsart->print(' ');
 	}
-	Serial.print(" LEN:");//("(LEN:")
-	Serial.println(bLength);
+	mDebugUsart->print(" LEN:");//("(LEN:")
+	mDebugUsart->println(bLength);
 }
 
 byte Dynamixel::txRxPacket(byte bID, byte bInst, int bTxParaLen)
@@ -303,7 +312,7 @@ byte Dynamixel::txRxPacket(byte bID, byte bInst, int bTxParaLen)
     //this for-loop is useless since there is no break if succesfull the first time
     for(bTryCount = 0; bTryCount < gbDXLNumberTxRxAttempts; bTryCount++)
     {
-        Serial2.clear();
+        mDxlUsart->clear();
         
         //TX
         bTxLen = txPacket(bID, bInst, bTxParaLen);

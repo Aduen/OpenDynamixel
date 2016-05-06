@@ -15,8 +15,10 @@
 class Dynamixel {
 public:
 	Dynamixel(HardwareSerial *serial);
-	virtual ~Dynamixel();
-
+    virtual ~Dynamixel();
+    
+    void addDebugStream(HardwareSerial *serial);
+    
 	/////////// Device control methods /////////////
 	void begin(int buad, uint8_t DE_pin);
 	uint8_t readRaw(void);
@@ -133,24 +135,19 @@ public:
 	void pushParam(byte value);
 	void flushPacket(void);
 
-	/*
-	 * Utility methods for Dynamixel
-	 */
-
-	/*byte getLowByte( word wData ); //can be replaced by DXL_LOBYTE(w)
-	byte getHighByte( word wData );//can be replaced by DXL_HIBYTE(w)
-	word makeWord( byte lowbyte, byte highbyte ); //can be replaced by DXL_MAKEWORD(w)*/
-
 private:
 	void printBuffer(byte *bpPrintBuffer, byte bLength);
-
+    
 	byte checkPacketType(void);
 
 	uint8_t setDxlLibStatRtnLvl(uint8_t); // inspired by NaN (robotsource.org)
 	uint8_t setDxlLibNumTries(uint8_t); // inspired by NaN (robotsource.org)
 
-	HardwareSerial *mDxlUsart;  /*< USART Device*/
-
+	HardwareSerial *mDxlUsart;  /*<DXL USART Device>*/
+    HardwareSerial *mDebugUsart; /*<USB Debug>*/
+    
+    uint8_t debugFlag;
+    
 	uint8_t mDirPin;
 
 	uint8_t mRxBuffer[DXL_RX_BUF_SIZE];
