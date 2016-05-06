@@ -1,5 +1,5 @@
 # OpenDynamixel
-Robotis Dynamixel protocol support for Teensy 3x and more
+Robotis Dynamixel support for Teensy 3x and more
 
 This is a straight port from the Robotis-Pandora OpenCM libraries (https://github.com/robotis-pandora/ROBOTIS-OpenCM), optimised for the Teensy 3x. Current release only supports the 2.0 Protocol. When I have some hardware to test the 1.0 protocol, this will be released as a seperate branch. It does not have DE triggering implemented since this is already supported by the Teensyduino library. I will make it possible to be run by an Arduino, that do not have DE pin support, in a future release.
 
